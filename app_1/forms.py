@@ -17,19 +17,21 @@ class Formulario1(forms.Form):
     dias_semana = forms.MultipleChoiceField(label='Dias de la semana', choices=DIAS_SEMANA_CHOICES, widget=forms.CheckboxSelectMultiple, help_text="Debe elegir al menos un día y máximo 3")
     correo_electronico = forms.EmailField(max_length=100, help_text="El correo electrónico debe escribirse de esta manera: XXX@iesmartinezm.es")
 
-    def clean(self):
+    def clean_fecha_fin(self):
         cleaned_data = super().clean()
         fecha_inicio = cleaned_data.get('fecha_inicio')
         fecha_fin = cleaned_data.get('fecha_fin')
-        dias_semana = cleaned_data.get('dias_semana')
-        correo_electronico = cleaned_data.get('correo_electronico')
-
-        # Realiza validaciones personalizadas si es necesario
         if fecha_inicio and fecha_fin and fecha_inicio > fecha_fin:
             raise ValidationError("La fecha de inicio no puede ser posterior a la fecha de fin.")
+    def clean_dias_semana(self):
+        cleaned_data = super().clean()
+        dias_semana = cleaned_data.get('dias_semana')
         if not dias_semana:
             raise ValidationError("Debe elegir al menos un día")
         if len(dias_semana) > 3:
             raise ValidationError("No puede elegir más de 3 días")
+    def clean_correo_electronico(self):
+        cleaned_data = super().clean()
+        correo_electronico = cleaned_data.get('correo_electronico')
         if not correo_electronico.endswith('@iesmartinezm.es'):
             raise ValidationError("El correo electrónico debe acabar en @iesmartinezm.es")
